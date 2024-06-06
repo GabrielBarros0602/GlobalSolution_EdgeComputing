@@ -1,0 +1,92 @@
+# Código C++
+
+// C++ code
+//
+
+// Definindo os tipos dos valores presentes no código
+
+float valorSensor;
+float valorTemperatura;
+
+int umidade;
+
+int valorGas;
+int limiteGas = 80;
+
+int sensorPIR;
+
+// Definindo os pinos de entrada e saída de informações e iniciando o monitor serial
+void setup()
+{
+  Serial.begin(9600);	
+  pinMode(A0, INPUT);
+  
+  pinMode(A1, OUTPUT);
+  pinMode(A2, INPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  
+  pinMode(A5, INPUT);
+  
+  pinMode(2, INPUT);
+}
+
+// Código utilizado para converter as informações recebidas dos sensores para algo de fácil comprenssão e apresentar elas no monitor serial, também é feita a ativação ou desativação dos Leds presentes na protoboard
+
+void loop()
+{
+  valorSensor = analogRead(A0);  
+  valorTemperatura = ((165 * valorSensor - 16820) / 338);
+    
+  Serial.print("Temperatura aproximada em graus celsius : ");
+  Serial.println(valorTemperatura);
+  
+  digitalWrite(A1, HIGH);
+  umidade = analogRead(A2);
+  digitalWrite(A1, LOW);
+  Serial.print("Umidade : ");
+  Serial.println(umidade);
+  digitalWrite(8, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(10, LOW);
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  
+  if (umidade < 200) {
+    digitalWrite(12, HIGH);
+  } else {
+    if (umidade < 400) {
+      digitalWrite(11, HIGH);
+    } else {
+      if (umidade < 600) {
+        digitalWrite(10, HIGH);
+      } else {
+        if (umidade < 800) {
+          digitalWrite(9, HIGH);
+        } else {
+          digitalWrite(8, HIGH);
+        }
+      }
+    }
+  }
+  
+  valorGas = analogRead(A5);
+  Serial.print("Nivel de gas presente : ");
+  Serial.println(valorGas);
+  
+  if (valorGas > limiteGas)
+  {
+    Serial.println("!!! PERIGO !!! Nivel de gas acima do limite!");
+  }
+    
+  sensorPIR = digitalRead(2);
+  
+  if (sensorPIR == HIGH)
+  {
+    Serial.println("!!! ALERTA !!! Movimento detectado!");
+  }
+  delay(1000); 
+}
